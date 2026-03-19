@@ -7,14 +7,15 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Dashboard'),
+        title: Image.asset('lib/assests/Home page logo.png', height: 40),
+        centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.home, size: 80, color: Colors.blue),
-            SizedBox(height: 20),
+          children: [
+            Image.asset('lib/assests/Home page logo.png', height: 80),
+            const SizedBox(height: 20),
             Text('Welcome to PeerConnect', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             Text('Recent Community Updates', style: TextStyle(fontSize: 18)),

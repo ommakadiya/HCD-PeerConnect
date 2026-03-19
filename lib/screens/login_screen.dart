@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.people_alt, size: 100, color: Colors.teal),
+              Image.asset('lib/assests/App Icon.png', height: 100),
               const SizedBox(height: 30),
               const Text(
                 'Welcome to PeerConnect',
