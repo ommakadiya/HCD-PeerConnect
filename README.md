@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # peer_connect
 
 A new Flutter project.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# HCD-PeerConnect
+This project is for a community-driven application built specifically for students studying abroad and their parents.  The platform focuses on enabling meaningful connections, information sharing, and support through a structured and scalable backend design.
+>>>>>>> 934fc881680125385f04064328b45ba25bc859b4
