@@ -1,5 +1,4 @@
 // This file can provide convenient mock data for UI testing.
-import 'package:flutter/material.dart';
 
 import 'user.dart';
 import 'student_profile.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'main_layout.dart';
+import 'role_selection_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -14,15 +14,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleGoogleSignIn() async {
     setState(() => _isLoading = true);
-    
+
     // Mock network delay for authentication
     await Future.delayed(const Duration(seconds: 2));
-    
+
     setState(() => _isLoading = false);
-    
+
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MainLayout()),
+        MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
       );
     }
   }
@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('lib/assests/App Icon.png', height: 100),
+              Image.asset('lib/assests/app logo.png', height: 180),
               const SizedBox(height: 30),
               const Text(
                 'Welcome to PeerConnect',
@@ -57,7 +57,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black87,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                           side: BorderSide(color: Colors.grey.shade300),
@@ -65,10 +68,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         elevation: 2,
                       ),
                       onPressed: _handleGoogleSignIn,
-                      icon: const Icon(FontAwesomeIcons.google, color: Colors.red),
+                      icon: const Icon(
+                        FontAwesomeIcons.google,
+                        color: Colors.red,
+                      ),
                       label: const Text(
                         'Sign in with Google',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
             ],
