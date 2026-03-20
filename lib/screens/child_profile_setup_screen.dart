@@ -104,7 +104,7 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: const BoxDecoration(
-                              color: Color(0xFF5A9BB1),
+                              color: Color(0xFF003366),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
@@ -155,7 +155,7 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
                   height: 54,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF5A9BB1),
+                      backgroundColor: const Color(0xFF003366),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -199,7 +199,7 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
       },
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF5A9BB1)),
+        prefixIcon: Icon(icon, color: const Color(0xFF003366)),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -212,7 +212,7 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF5A9BB1), width: 2),
+          borderSide: const BorderSide(color: Color(0xFF003366), width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),

@@ -51,9 +51,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         opacity: _opacity,
         child: Center(
           child: Image.asset(
-            'lib/assests/logo_appearing_while_opening.png',
+            'assets/logo_appearing_while_opening.png',
             fit: BoxFit.fitWidth,
             width: double.infinity,
+            errorBuilder: (context, error, stackTrace) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Error loading image: \n$error',
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            },
           ),
         ),
       ),

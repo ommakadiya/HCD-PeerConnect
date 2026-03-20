@@ -17,7 +17,7 @@ class RoleSelectionScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 60),
-              Image.asset('lib/assests/app logo.png', height: 100),
+              Image.asset('assets/app logo.jpg', height: 100),
               const SizedBox(height: 30),
               const Text(
                 'Who are you?',
@@ -41,7 +41,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       icon: Icons.child_care,
                       title: 'I am a Child',
                       subtitle: 'Set up your profile and connect with your parents',
-                      color: const Color(0xFF5A9BB1),
+                      color: const Color(0xFF003366),
                       onTap: () {
                         Provider.of<AppStateProvider>(context, listen: false).setRole('child');
                         Navigator.of(context).pushReplacement(
@@ -55,7 +55,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       icon: Icons.family_restroom,
                       title: 'I am a Parent',
                       subtitle: 'Set up your profile and link to your child',
-                      color: const Color(0xFF78C091),
+                      color: const Color(0xFF003366),
                       onTap: () {
                         Provider.of<AppStateProvider>(context, listen: false).setRole('parent');
                         Navigator.of(context).pushReplacement(

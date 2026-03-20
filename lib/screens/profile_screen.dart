@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Stack(
               children: [
                 Container(
-                  height: 260,
+                  height: 230,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Color(0xFFD4E6F1), Color(0xFFD1F2EB)],
@@ -47,22 +47,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Image.asset('lib/assests/app bar logo - Copy.png', height: 28),
-                            const Text(
-                              'Profile & Settings',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(width: 28),
+                            Image.asset('assets/app bar logo - Copy.png', height: 28),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Profile & Settings',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
 
                       // Profile Card
                       Container(
@@ -118,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: isChild ? const Color(0xFF5A9BB1) : const Color(0xFF78C091),
+                                      color: isChild ? const Color(0xFF003366) : const Color(0xFF003366),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -253,7 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           height: 50,
                           child: ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF78C091),
+                              backgroundColor: const Color(0xFF003366),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -321,7 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF5A9BB1)),
+      leading: Icon(icon, color: const Color(0xFF003366)),
       title: Text(value.isNotEmpty ? value : '—', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
       subtitle: Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
       visualDensity: VisualDensity.compact,
@@ -330,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildSettingsTile(IconData icon, String title) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF5A9BB1)),
+      leading: Icon(icon, color: const Color(0xFF003366)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
     );
@@ -338,12 +342,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildSwitchTile(IconData icon, String title, bool value, ValueChanged<bool> onChanged) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF5A9BB1)),
+      leading: Icon(icon, color: const Color(0xFF003366)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: const Color(0xFF5A9BB1),
+        activeColor: const Color(0xFF003366),
         activeTrackColor: const Color(0xFFD4E6F1),
       ),
     );

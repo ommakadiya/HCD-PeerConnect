@@ -131,20 +131,39 @@ class PeerConnectApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        scaffoldBackgroundColor: const Color(0xFFF4F7F6),
+        primaryColor: const Color(0xFF003366),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF003366),
+          primary: const Color(0xFF003366),
+          surface: Colors.white,
+          error: const Color(0xFFFF7F50), // Soft Coral for alerts
+        ),
         textTheme: GoogleFonts.interTextTheme(
           Theme.of(context).textTheme,
         ).copyWith(
-          // Ensure large default font sizes for accessibility
-          bodyMedium: GoogleFonts.inter(fontSize: 16),
-          bodyLarge: GoogleFonts.inter(fontSize: 18),
+          bodyLarge: GoogleFonts.inter(fontSize: 18, color: const Color(0xFF2D3436)),
+          bodyMedium: GoogleFonts.inter(fontSize: 16, color: const Color(0xFF2D3436)),
+          bodySmall: GoogleFonts.inter(color: const Color(0xFF636E72)),
+          titleLarge: GoogleFonts.inter(color: const Color(0xFF2D3436), fontWeight: FontWeight.w600),
+          titleMedium: GoogleFonts.inter(color: const Color(0xFF2D3436), fontWeight: FontWeight.w500),
+        ).apply(
+          bodyColor: const Color(0xFF2D3436),
+          displayColor: const Color(0xFF2D3436),
         ),
         appBarTheme: const AppBarTheme(
           centerTitle: true,
-          titleTextStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.black87),
+          titleTextStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Color(0xFF2D3436)),
           backgroundColor: Colors.white,
-          elevation: 1,
-          iconTheme: IconThemeData(color: Colors.black87),
+          surfaceTintColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          iconTheme: IconThemeData(color: Color(0xFF003366)),
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFF003366),
+          unselectedItemColor: Color(0xFF636E72),
         ),
       ),
       home: const SplashScreen(),

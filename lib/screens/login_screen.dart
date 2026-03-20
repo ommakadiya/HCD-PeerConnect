@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('lib/assests/app logo.png', height: 180),
+              Image.asset('assets/app logo.jpg', height: 180),
               const SizedBox(height: 30),
               const Text(
                 'Welcome to PeerConnect',

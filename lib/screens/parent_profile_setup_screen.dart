@@ -132,7 +132,7 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: const BoxDecoration(
-                              color: Color(0xFF78C091),
+                              color: Color(0xFF003366),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
@@ -166,13 +166,13 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
                   Center(
                     child: OutlinedButton.icon(
                       onPressed: () => setState(() => _parentCount = 2),
-                      icon: const Icon(Icons.person_add, color: Color(0xFF78C091)),
+                      icon: const Icon(Icons.person_add, color: Color(0xFF003366)),
                       label: const Text(
                         'Add Another Parent',
-                        style: TextStyle(color: Color(0xFF78C091), fontWeight: FontWeight.w600),
+                        style: TextStyle(color: Color(0xFF003366), fontWeight: FontWeight.w600),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF78C091)),
+                        side: const BorderSide(color: Color(0xFF003366)),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                       ),
@@ -208,7 +208,7 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
                   height: 54,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF78C091),
+                      backgroundColor: const Color(0xFF003366),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -277,7 +277,7 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
       },
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF78C091)),
+        prefixIcon: Icon(icon, color: const Color(0xFF003366)),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -290,7 +290,7 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF78C091), width: 2),
+          borderSide: const BorderSide(color: Color(0xFF003366), width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),

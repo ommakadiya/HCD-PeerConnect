@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'student_connections_screen.dart';
-import 'parent_connections_screen.dart';
+import 'help_screen.dart';
 import 'profile_screen.dart';
 
 class MainLayout extends StatefulWidget {
@@ -17,7 +17,7 @@ class _MainLayoutState extends State<MainLayout> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const StudentConnectionsScreen(),
-    const ParentConnectionsScreen(),
+    const HelpScreen(),
     const ProfileScreen(),
   ];
 
@@ -33,8 +33,6 @@ class _MainLayoutState extends State<MainLayout> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 13,
@@ -46,12 +44,12 @@ class _MainLayoutState extends State<MainLayout> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.school, size: 28),
-            label: 'Students',
+            icon: Icon(Icons.people_alt, size: 28),
+            label: 'Connect',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.family_restroom, size: 28),
-            label: 'Parents',
+            icon: Icon(Icons.campaign, size: 28),
+            label: 'Help',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person, size: 28),
