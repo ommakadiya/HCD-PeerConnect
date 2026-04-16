@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../main.dart';
 import 'login_screen.dart';
+import 'main_layout.dart';
+import 'role_selection_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -8,7 +12,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacity;
 
@@ -21,20 +26,41 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
     _opacity = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
 
-    // Fade out and navigate after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () async {
-      if (mounted) {
-        await _controller.forward();
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const LoginScreen(),
-              transitionDuration: Duration.zero,
-            ),
-          );
-        }
-      }
-    });
+    // Wait for splash then check session
+    Future.delayed(const Duration(seconds: 3), _checkSessionAndNavigate);
+  }
+
+  Future<void> _checkSessionAndNavigate() async {
+    if (!mounted) return;
+
+    final provider = context.read<AppStateProvider>();
+
+    // Try to restore Firebase session from a previous sign-in
+    final hasCompletedProfile = await provider.tryRestoreSession();
+
+    if (!mounted) return;
+
+    await _controller.forward(); // fade out
+    if (!mounted) return;
+
+    Widget destination;
+    if (!provider.isLoggedIn) {
+      // Not signed in → Login
+      destination = const LoginScreen();
+    } else if (!hasCompletedProfile) {
+      // Signed in but no profile → Role selection
+      destination = const RoleSelectionScreen();
+    } else {
+      // Fully set up → Home
+      destination = const MainLayout();
+    }
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => destination,
+        transitionDuration: Duration.zero,
+      ),
+    );
   }
 
   @override

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import '../main.dart';
 import 'role_selection_screen.dart';
+import 'main_layout.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,19 +14,43 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
+  String? _errorMessage;
 
-  void _handleGoogleSignIn() async {
-    setState(() => _isLoading = true);
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
-    // Mock network delay for authentication
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final provider = context.read<AppStateProvider>();
+      final profileComplete = await provider.signInWithGoogle();
 
-    setState(() => _isLoading = false);
+      if (!mounted) return;
 
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
-      );
+      if (!provider.isLoggedIn) {
+        // User cancelled Google sign-in picker
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      if (profileComplete) {
+        // Existing user with a completed profile → go directly to home
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainLayout()),
+        );
+      } else {
+        // New user → choose role
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Sign-in failed. Please try again.';
+      });
     }
   }
 
@@ -51,6 +78,33 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
               const SizedBox(height: 60),
+
+              // Error message
+              if (_errorMessage != null) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade400, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red.shade700, fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              // Sign-in button / loader
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton.icon(

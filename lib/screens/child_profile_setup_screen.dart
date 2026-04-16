@@ -12,6 +12,7 @@ class ChildProfileSetupScreen extends StatefulWidget {
 
 class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool _isSaving = false;
 
   final _nameController = TextEditingController();
   final _originCityController = TextEditingController();
@@ -35,10 +36,13 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
     super.dispose();
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSaving = true);
+    try {
       final provider = Provider.of<AppStateProvider>(context, listen: false);
-      provider.completeChildProfile(
+      await provider.completeChildProfile(
         name: _nameController.text.trim(),
         originCity: _originCityController.text.trim(),
         migratedCity: _migratedCityController.text.trim(),
@@ -48,8 +52,15 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
         parentName: _parentNameController.text.trim(),
         parentEmail: _parentEmailController.text.trim(),
       );
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const MainLayout()),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save profile: $e'), backgroundColor: Colors.red),
       );
     }
   }
@@ -162,8 +173,18 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: _submitForm,
-                    child: const Text('Complete Setup', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                    onPressed: _isSaving ? null : _submitForm,
+                    child: _isSaving
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Text('Complete Setup',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   ),
                 ),
                 const SizedBox(height: 30),

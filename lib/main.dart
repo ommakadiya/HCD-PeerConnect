@@ -1,18 +1,44 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'firebase_options.dart';
+import 'services/auth_service.dart';
+import 'services/user_service.dart';
 import 'screens/splash_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppStateProvider()),
+        // Services — created once, available app-wide
+        Provider<AuthService>(create: (_) => AuthService()),
+        Provider<UserService>(create: (_) => UserService()),
+
+        // App state — depends on AuthService
+        ChangeNotifierProxyProvider<AuthService, AppStateProvider>(
+          create: (ctx) => AppStateProvider(
+            authService: ctx.read<AuthService>(),
+            userService: ctx.read<UserService>(),
+          ),
+          update: (ctx, auth, prev) =>
+              prev ?? AppStateProvider(authService: auth, userService: ctx.read<UserService>()),
+        ),
       ],
       child: const PeerConnectApp(),
     ),
   );
 }
+
+// ──────────────────────────────────────────────────────────────────────────────
+// ParentDetail helper model (used in parent profile setup)
+// ──────────────────────────────────────────────────────────────────────────────
 
 class ParentDetail {
   String name;
@@ -38,32 +64,68 @@ class ParentDetail {
       address.isNotEmpty &&
       occupation.isNotEmpty &&
       childEmailId.isNotEmpty;
+
+  Map<String, String> toMap() => {
+        'name': name,
+        'originCity': originCity,
+        'phone': phone,
+        'address': address,
+        'occupation': occupation,
+        'childEmailId': childEmailId,
+      };
 }
 
-class AppStateProvider extends ChangeNotifier {
-  // Role: 'child' or 'parent'
-  String? _role;
-  bool _profileCompleted = false;
+// ──────────────────────────────────────────────────────────────────────────────
+// AppStateProvider — merges auth state + Firestore profile data
+// ──────────────────────────────────────────────────────────────────────────────
 
-  // Common fields
+class AppStateProvider extends ChangeNotifier {
+  final AuthService _authService;
+  final UserService _userService;
+
+  AppStateProvider({
+    required AuthService authService,
+    required UserService userService,
+  })  : _authService = authService,
+        _userService = userService;
+
+  // ── Auth ────────────────────────────────────────────────────────────────
+
+  bool _isLoggedIn = false;
+  bool _profileCompleted = false;
+  bool _isLoading = false;
+
+  bool get isLoggedIn => _isLoggedIn;
+  bool get profileCompleted => _profileCompleted;
+  bool get isLoading => _isLoading;
+
+  // ── Profile fields ────────────────────────────────────────────────────────
+
+  String? _role; // 'child' or 'parent'
+  String _userId = '';
   String _name = '';
+  String _email = '';
+  String _photoUrl = '';
   String _originCity = '';
   String _phone = '';
   String _address = '';
   String _occupation = '';
 
-  // Child-specific fields
+  // Child-specific
   String _migratedCity = '';
   String _parentName = '';
   String _parentEmail = '';
 
-  // Parent-specific: list of 1-2 parent details
+  // Parent-specific
   List<ParentDetail> _parentDetails = [ParentDetail()];
 
-  // Getters
+  // ── Getters ────────────────────────────────────────────────────────────────
+
   String? get role => _role;
-  bool get profileCompleted => _profileCompleted;
+  String get userId => _userId;
   String get name => _name;
+  String get email => _email;
+  String get photoUrl => _photoUrl;
   String get originCity => _originCity;
   String get phone => _phone;
   String get address => _address;
@@ -72,15 +134,128 @@ class AppStateProvider extends ChangeNotifier {
   String get parentName => _parentName;
   String get parentEmail => _parentEmail;
   List<ParentDetail> get parentDetails => _parentDetails;
+  bool get isProfileComplete => _profileCompleted;
+
+  // ─── Sign-In ──────────────────────────────────────────────────────────────
+
+  /// Signs in with Google and loads the user profile from Firestore.
+  /// Returns true if a profile was already completed (skip role selection).
+  Future<bool> signInWithGoogle() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final credential = await _authService.signInWithGoogle();
+      if (credential == null) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final firebaseUser = credential.user!;
+      _userId = firebaseUser.uid;
+      _name = firebaseUser.displayName ?? '';
+      _email = firebaseUser.email ?? '';
+      _photoUrl = firebaseUser.photoURL ?? '';
+      _isLoggedIn = true;
+
+      // Upsert base user document
+      await _userService.createOrUpdateUser(
+        userId: _userId,
+        name: _name,
+        email: _email,
+        photoUrl: _photoUrl,
+      );
+
+      // Load existing profile if present
+      final profileComplete = await loadUserProfile();
+      _isLoading = false;
+      notifyListeners();
+      return profileComplete;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  /// Loads user profile data from Firestore into state.
+  /// Returns true if the profile was already completed.
+  Future<bool> loadUserProfile() async {
+    if (_userId.isEmpty) return false;
+
+    final data = await _userService.getUser(_userId);
+    if (data == null) return false;
+
+    _role = data['role'] as String?;
+    _profileCompleted = data['profileCompleted'] == true;
+
+    if (_profileCompleted) {
+      _name = data['name'] ?? _name;
+
+      if (_role == 'child') {
+        final cp = data['childProfile'] as Map<String, dynamic>? ?? {};
+        _originCity = cp['originCity'] ?? '';
+        _migratedCity = cp['migratedCity'] ?? '';
+        _phone = cp['phone'] ?? '';
+        _address = cp['address'] ?? '';
+        _occupation = cp['occupation'] ?? '';
+        _parentName = cp['parentName'] ?? '';
+        _parentEmail = cp['parentEmail'] ?? '';
+      } else if (_role == 'parent') {
+        final pp = data['parentProfile'] as Map<String, dynamic>? ?? {};
+        final List rawParents = pp['parents'] as List? ?? [];
+        _parentDetails = rawParents.map((p) {
+          final m = Map<String, String>.from(p as Map);
+          return ParentDetail(
+            name: m['name'] ?? '',
+            originCity: m['originCity'] ?? '',
+            phone: m['phone'] ?? '',
+            address: m['address'] ?? '',
+            occupation: m['occupation'] ?? '',
+            childEmailId: m['childEmailId'] ?? '',
+          );
+        }).toList();
+        if (_parentDetails.isNotEmpty) {
+          _originCity = _parentDetails[0].originCity;
+          _phone = _parentDetails[0].phone;
+          _address = _parentDetails[0].address;
+          _occupation = _parentDetails[0].occupation;
+        }
+      }
+    }
+
+    notifyListeners();
+    return _profileCompleted;
+  }
+
+  /// Call on app start if a Firebase user is already signed in.
+  Future<bool> tryRestoreSession() async {
+    final user = _authService.currentUser;
+    if (user == null) return false;
+
+    _userId = user.uid;
+    _name = user.displayName ?? '';
+    _email = user.email ?? '';
+    _photoUrl = user.photoURL ?? '';
+    _isLoggedIn = true;
+
+    return loadUserProfile();
+  }
+
+  // ── Role & Profile setters ─────────────────────────────────────────────────
 
   void setRole(String role) {
     _role = role;
-    // Reset parent details when switching role
     _parentDetails = [ParentDetail()];
     notifyListeners();
+    // Persist role to Firestore (fire-and-forget, ignore error here)
+    if (_userId.isNotEmpty) {
+      _userService.setRole(_userId, role);
+    }
   }
 
-  void completeChildProfile({
+  Future<void> completeChildProfile({
     required String name,
     required String originCity,
     required String migratedCity,
@@ -89,7 +264,7 @@ class AppStateProvider extends ChangeNotifier {
     required String occupation,
     required String parentName,
     required String parentEmail,
-  }) {
+  }) async {
     _name = name;
     _originCity = originCity;
     _migratedCity = migratedCity;
@@ -100,13 +275,24 @@ class AppStateProvider extends ChangeNotifier {
     _parentEmail = parentEmail;
     _profileCompleted = true;
     notifyListeners();
+
+    await _userService.saveChildProfile(
+      userId: _userId,
+      name: name,
+      originCity: originCity,
+      migratedCity: migratedCity,
+      phone: phone,
+      address: address,
+      occupation: occupation,
+      parentName: parentName,
+      parentEmail: parentEmail,
+    );
   }
 
-  void completeParentProfile({
+  Future<void> completeParentProfile({
     required List<ParentDetail> parents,
-  }) {
+  }) async {
     _parentDetails = parents;
-    // Use first parent's info as the main profile info
     if (parents.isNotEmpty) {
       _name = parents[0].name;
       _originCity = parents[0].originCity;
@@ -116,10 +302,39 @@ class AppStateProvider extends ChangeNotifier {
     }
     _profileCompleted = true;
     notifyListeners();
+
+    await _userService.saveParentProfile(
+      userId: _userId,
+      parents: parents.map((p) => p.toMap()).toList(),
+    );
   }
 
-  bool get isProfileComplete => _profileCompleted;
+  // ── Sign-Out ───────────────────────────────────────────────────────────────
+
+  Future<void> signOut() async {
+    await _authService.signOut();
+    _isLoggedIn = false;
+    _profileCompleted = false;
+    _userId = '';
+    _name = '';
+    _email = '';
+    _photoUrl = '';
+    _role = null;
+    _originCity = '';
+    _migratedCity = '';
+    _phone = '';
+    _address = '';
+    _occupation = '';
+    _parentName = '';
+    _parentEmail = '';
+    _parentDetails = [ParentDetail()];
+    notifyListeners();
+  }
 }
+
+// ──────────────────────────────────────────────────────────────────────────────
+// App Root
+// ──────────────────────────────────────────────────────────────────────────────
 
 class PeerConnectApp extends StatelessWidget {
   const PeerConnectApp({super.key});
@@ -137,7 +352,7 @@ class PeerConnectApp extends StatelessWidget {
           seedColor: const Color(0xFF003366),
           primary: const Color(0xFF003366),
           surface: Colors.white,
-          error: const Color(0xFFFF7F50), // Soft Coral for alerts
+          error: const Color(0xFFFF7F50),
         ),
         textTheme: GoogleFonts.interTextTheme(
           Theme.of(context).textTheme,
