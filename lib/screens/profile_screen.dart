@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
-import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -267,15 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             icon: const Icon(Icons.logout),
                             label: const Text('Logout', style: TextStyle(fontSize: 16)),
-                            onPressed: () async {
-                              final provider = context.read<AppStateProvider>();
-                              await provider.signOut();
-                              if (!context.mounted) return;
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                                (route) => false,
-                              );
-                            },
+                            onPressed: () {},
                           ),
                         ),
                         const SizedBox(height: 16),

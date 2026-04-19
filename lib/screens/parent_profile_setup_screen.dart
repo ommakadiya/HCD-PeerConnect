@@ -13,7 +13,6 @@ class ParentProfileSetupScreen extends StatefulWidget {
 class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
   int _parentCount = 1; // 1 or 2
-  bool _isSaving = false;
 
   // Parent 1 controllers
   final _name1 = TextEditingController();
@@ -48,11 +47,8 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
     super.dispose();
   }
 
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSaving = true);
-    try {
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
       final provider = Provider.of<AppStateProvider>(context, listen: false);
 
       List<ParentDetail> parents = [
@@ -79,16 +75,9 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
         );
       }
 
-      await provider.completeParentProfile(parents: parents);
-      if (!mounted) return;
+      provider.completeParentProfile(parents: parents);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const MainLayout()),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save profile: $e'), backgroundColor: Colors.red),
       );
     }
   }
@@ -226,18 +215,8 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: _isSaving ? null : _submitForm,
-                    child: _isSaving
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
-                        : const Text('Complete Setup',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                    onPressed: _submitForm,
+                    child: const Text('Complete Setup', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   ),
                 ),
                 const SizedBox(height: 30),
