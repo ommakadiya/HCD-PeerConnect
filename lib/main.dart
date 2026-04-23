@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
+import 'providers/user_provider.dart';
+import 'providers/connection_provider.dart';
+import 'providers/data_provider.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppStateProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ConnectionProvider()),
+        ChangeNotifierProvider(create: (_) => DataProvider()..loadData()),
       ],
       child: const PeerConnectApp(),
     ),
@@ -44,6 +50,7 @@ class AppStateProvider extends ChangeNotifier {
   // Role: 'child' or 'parent'
   String? _role;
   bool _profileCompleted = false;
+  bool _isDarkMode = false;
 
   // Common fields
   String _name = '';
@@ -53,7 +60,10 @@ class AppStateProvider extends ChangeNotifier {
   String _occupation = '';
 
   // Child-specific fields
+  String _university = '';
+  String _course = '';
   String _migratedCity = '';
+  String _migratedCountry = '';
   String _parentName = '';
   String _parentEmail = '';
 
@@ -68,10 +78,19 @@ class AppStateProvider extends ChangeNotifier {
   String get phone => _phone;
   String get address => _address;
   String get occupation => _occupation;
+  String get university => _university;
+  String get course => _course;
   String get migratedCity => _migratedCity;
+  String get migratedCountry => _migratedCountry;
   String get parentName => _parentName;
   String get parentEmail => _parentEmail;
   List<ParentDetail> get parentDetails => _parentDetails;
+  bool get isDarkMode => _isDarkMode;
+
+  void toggleTheme(bool value) {
+    _isDarkMode = value;
+    notifyListeners();
+  }
 
   void setRole(String role) {
     _role = role;
@@ -83,7 +102,10 @@ class AppStateProvider extends ChangeNotifier {
   void completeChildProfile({
     required String name,
     required String originCity,
+    required String university,
+    required String course,
     required String migratedCity,
+    required String migratedCountry,
     required String phone,
     required String address,
     required String occupation,
@@ -92,13 +114,23 @@ class AppStateProvider extends ChangeNotifier {
   }) {
     _name = name;
     _originCity = originCity;
+    _university = university;
+    _course = course;
     _migratedCity = migratedCity;
+    _migratedCountry = migratedCountry;
     _phone = phone;
     _address = address;
     _occupation = occupation;
     _parentName = parentName;
     _parentEmail = parentEmail;
     _profileCompleted = true;
+    notifyListeners();
+  }
+
+  void updateProfile({String? name, String? university, String? course}) {
+    if (name != null && name.isNotEmpty) _name = name;
+    if (university != null && university.isNotEmpty) _university = university;
+    if (course != null && course.isNotEmpty) _course = course;
     notifyListeners();
   }
 
@@ -118,6 +150,24 @@ class AppStateProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetData() {
+    _role = null;
+    _profileCompleted = false;
+    _name = '';
+    _originCity = '';
+    _phone = '';
+    _address = '';
+    _occupation = '';
+    _university = '';
+    _course = '';
+    _migratedCity = '';
+    _migratedCountry = '';
+    _parentName = '';
+    _parentEmail = '';
+    _parentDetails = [ParentDetail()];
+    notifyListeners();
+  }
+
   bool get isProfileComplete => _profileCompleted;
 }
 
@@ -126,46 +176,14 @@ class PeerConnectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<AppStateProvider>(context);
+
     return MaterialApp(
       title: 'PeerConnect',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFF4F7F6),
-        primaryColor: const Color(0xFF003366),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF003366),
-          primary: const Color(0xFF003366),
-          surface: Colors.white,
-          error: const Color(0xFFFF7F50), // Soft Coral for alerts
-        ),
-        textTheme: GoogleFonts.interTextTheme(
-          Theme.of(context).textTheme,
-        ).copyWith(
-          bodyLarge: GoogleFonts.inter(fontSize: 18, color: const Color(0xFF2D3436)),
-          bodyMedium: GoogleFonts.inter(fontSize: 16, color: const Color(0xFF2D3436)),
-          bodySmall: GoogleFonts.inter(color: const Color(0xFF636E72)),
-          titleLarge: GoogleFonts.inter(color: const Color(0xFF2D3436), fontWeight: FontWeight.w600),
-          titleMedium: GoogleFonts.inter(color: const Color(0xFF2D3436), fontWeight: FontWeight.w500),
-        ).apply(
-          bodyColor: const Color(0xFF2D3436),
-          displayColor: const Color(0xFF2D3436),
-        ),
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          titleTextStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Color(0xFF2D3436)),
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          iconTheme: IconThemeData(color: Color(0xFF003366)),
-        ),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: Color(0xFF003366),
-          unselectedItemColor: Color(0xFF636E72),
-        ),
-      ),
+      themeMode: provider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       home: const SplashScreen(),
     );
   }

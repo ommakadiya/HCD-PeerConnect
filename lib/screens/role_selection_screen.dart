@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
+import '../theme/app_theme.dart';
 import 'child_profile_setup_screen.dart';
 import 'parent_profile_setup_screen.dart';
 
@@ -9,28 +10,29 @@ class RoleSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F9),
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Column(
             children: [
               const SizedBox(height: 60),
               Image.asset('assets/app logo.jpg', height: 100),
               const SizedBox(height: 30),
-              const Text(
+              Text(
                 'Who are you?',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+                style: theme.textTheme.headlineMedium,
               ),
               const SizedBox(height: 10),
               Text(
                 'Select your role to get started',
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 50),
               Expanded(
@@ -38,10 +40,9 @@ class RoleSelectionScreen extends StatelessWidget {
                   children: [
                     _buildRoleCard(
                       context,
-                      icon: Icons.child_care,
-                      title: 'I am a Child',
+                      icon: Icons.school,
+                      title: 'I am a Student',
                       subtitle: 'Set up your profile and connect with your parents',
-                      color: const Color(0xFF003366),
                       onTap: () {
                         Provider.of<AppStateProvider>(context, listen: false).setRole('child');
                         Navigator.of(context).pushReplacement(
@@ -52,10 +53,9 @@ class RoleSelectionScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     _buildRoleCard(
                       context,
-                      icon: Icons.family_restroom,
+                      icon: Icons.supervisor_account,
                       title: 'I am a Parent',
                       subtitle: 'Set up your profile and link to your child',
-                      color: const Color(0xFF003366),
                       onTap: () {
                         Provider.of<AppStateProvider>(context, listen: false).setRole('parent');
                         Navigator.of(context).pushReplacement(
@@ -78,35 +78,35 @@ class RoleSelectionScreen extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
-    required Color color,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = AppColors.primary;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withOpacity(0.3), width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.1),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          color: isDark ? AppColors.darkSurface : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          border: Border.all(
+            color: isDark ? AppColors.darkBorder : primary.withValues(alpha: 0.2),
+            width: 1.5,
+          ),
+          boxShadow: AppShadows.sm(isDark: isDark),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
+                color: primary.withValues(alpha: isDark ? 0.15 : 0.08),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
-              child: Icon(icon, size: 40, color: color),
+              child: Icon(icon, size: 40, color: primary),
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -118,18 +118,21 @@ class RoleSelectionScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: color,
+                      color: primary,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: color, size: 20),
+            Icon(Icons.arrow_forward_ios, color: primary, size: 20),
           ],
         ),
       ),

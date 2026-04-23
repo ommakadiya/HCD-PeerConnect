@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
+import '../theme/app_theme.dart';
 import 'main_layout.dart';
 
 class ParentProfileSetupScreen extends StatefulWidget {
@@ -12,7 +13,7 @@ class ParentProfileSetupScreen extends StatefulWidget {
 
 class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
-  int _parentCount = 1; // 1 or 2
+  int _parentCount = 1;
 
   // Parent 1 controllers
   final _name1 = TextEditingController();
@@ -84,36 +85,39 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F9),
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: AppSpacing.lg),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+                // ── Header ──
                 Row(
                   children: [
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+                      icon: Icon(Icons.arrow_back_ios, size: 20, color: isDark ? AppColors.darkText : AppColors.textPrimary),
                     ),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Parent Profile Setup',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                     const SizedBox(width: 48),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSpacing.lg),
 
-                // Profile Photo
+                // ── Avatar ──
                 Center(
                   child: GestureDetector(
                     onTap: () {
@@ -122,104 +126,102 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
                     child: Stack(
                       children: [
                         CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.grey.shade300,
-                          child: Icon(Icons.person, size: 50, color: Colors.grey.shade500),
+                          radius: 44,
+                          backgroundColor: isDark ? AppColors.darkBorder : AppColors.border,
+                          child: Icon(Icons.person, size: 44, color: isDark ? AppColors.darkTextMuted : AppColors.textMuted),
                         ),
                         Positioned(
                           bottom: 0,
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(6),
                             decoration: const BoxDecoration(
-                              color: Color(0xFF003366),
+                              color: AppColors.primary,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                            child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Center(
-                  child: Text('Tap to add profile photo', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                const SizedBox(height: AppSpacing.sm),
+                Center(
+                  child: Text('Tap to add photo', style: theme.textTheme.labelMedium),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: AppSpacing.xl),
 
-                // ── Parent 1 ──
-                _buildSectionTitle('Parent 1 Details'),
-                const SizedBox(height: 12),
-                _buildParentForm(
-                  nameCtrl: _name1,
-                  cityCtrl: _originCity1,
-                  phoneCtrl: _phone1,
-                  addressCtrl: _address1,
-                  occupationCtrl: _occupation1,
-                  childEmailCtrl: _childEmail1,
+                // ── Parent 1 Card ──
+                _buildFormCard(
+                  title: 'PARENT 1 DETAILS',
+                  isDark: isDark,
+                  theme: theme,
+                  children: _buildParentFields(
+                    nameCtrl: _name1,
+                    cityCtrl: _originCity1,
+                    phoneCtrl: _phone1,
+                    addressCtrl: _address1,
+                    occupationCtrl: _occupation1,
+                    childEmailCtrl: _childEmail1,
+                    theme: theme,
+                    isDark: isDark,
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.lg),
 
                 // ── Add / Remove Parent 2 ──
                 if (_parentCount < 2)
                   Center(
                     child: OutlinedButton.icon(
                       onPressed: () => setState(() => _parentCount = 2),
-                      icon: const Icon(Icons.person_add, color: Color(0xFF003366)),
-                      label: const Text(
-                        'Add Another Parent',
-                        style: TextStyle(color: Color(0xFF003366), fontWeight: FontWeight.w600),
-                      ),
+                      icon: const Icon(Icons.person_add, size: 18),
+                      label: const Text('Add Another Parent'),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF003366)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
                       ),
                     ),
                   ),
 
                 if (_parentCount == 2) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildSectionTitle('Parent 2 Details'),
-                      TextButton(
-                        onPressed: () => setState(() => _parentCount = 1),
-                        child: const Text('Remove', style: TextStyle(color: Colors.redAccent)),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _buildParentForm(
-                    nameCtrl: _name2,
-                    cityCtrl: _originCity2,
-                    phoneCtrl: _phone2,
-                    addressCtrl: _address2,
-                    occupationCtrl: _occupation2,
-                    childEmailCtrl: _childEmail2,
+                  _buildFormCard(
+                    title: 'PARENT 2 DETAILS',
+                    isDark: isDark,
+                    theme: theme,
+                    trailing: TextButton(
+                      onPressed: () => setState(() => _parentCount = 1),
+                      child: const Text('Remove', style: TextStyle(color: AppColors.error, fontSize: 13)),
+                    ),
+                    children: _buildParentFields(
+                      nameCtrl: _name2,
+                      cityCtrl: _originCity2,
+                      phoneCtrl: _phone2,
+                      addressCtrl: _address2,
+                      occupationCtrl: _occupation2,
+                      childEmailCtrl: _childEmail2,
+                      theme: theme,
+                      isDark: isDark,
+                    ),
                   ),
                 ],
-                const SizedBox(height: 40),
+                const SizedBox(height: AppSpacing.xl),
 
-                // Submit Button
+                // ── Submit Button ──
                 SizedBox(
                   width: double.infinity,
-                  height: 54,
+                  height: 48,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF003366),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
                     onPressed: _submitForm,
-                    child: const Text('Complete Setup', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    ),
+                    child: const Text('Complete Setup', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: AppSpacing.xl),
               ],
             ),
           ),
@@ -228,71 +230,106 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+  // ── Form Card wrapper ──
+  Widget _buildFormCard({
+    required String title,
+    required bool isDark,
+    required ThemeData theme,
+    required List<Widget> children,
+    Widget? trailing,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+        boxShadow: AppShadows.sm(isDark: isDark),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                ),
+              ),
+              if (trailing != null) trailing,
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          ...children,
+        ],
+      ),
     );
   }
 
-  Widget _buildParentForm({
+  // ── Parent form fields ──
+  List<Widget> _buildParentFields({
     required TextEditingController nameCtrl,
     required TextEditingController cityCtrl,
     required TextEditingController phoneCtrl,
     required TextEditingController addressCtrl,
     required TextEditingController occupationCtrl,
     required TextEditingController childEmailCtrl,
+    required ThemeData theme,
+    required bool isDark,
   }) {
-    return Column(
-      children: [
-        _buildTextField(nameCtrl, 'Full Name', Icons.person),
-        const SizedBox(height: 14),
-        _buildTextField(cityCtrl, 'Origin City', Icons.location_city),
-        const SizedBox(height: 14),
-        _buildTextField(phoneCtrl, 'Phone Number', Icons.phone, keyboard: TextInputType.phone),
-        const SizedBox(height: 14),
-        _buildTextField(addressCtrl, 'Address', Icons.home),
-        const SizedBox(height: 14),
-        _buildTextField(occupationCtrl, 'Occupation', Icons.work),
-        const SizedBox(height: 14),
-        _buildTextField(childEmailCtrl, 'Child ID / Child Email', Icons.child_care, keyboard: TextInputType.emailAddress),
-      ],
-    );
+    return [
+      _buildField(nameCtrl, 'Full Name', Icons.person, theme, isDark),
+      _buildField(cityCtrl, 'Origin City', Icons.location_city, theme, isDark),
+      _buildField(phoneCtrl, 'Phone Number', Icons.phone, theme, isDark, keyboard: TextInputType.phone),
+      _buildField(addressCtrl, 'Address', Icons.home, theme, isDark),
+      _buildField(occupationCtrl, 'Occupation', Icons.work, theme, isDark),
+      _buildField(childEmailCtrl, 'Child ID / Child Email', Icons.child_care, theme, isDark, keyboard: TextInputType.emailAddress),
+    ];
   }
 
-  Widget _buildTextField(
+  // ── Single field: label ABOVE input, icon INSIDE ──
+  Widget _buildField(
     TextEditingController controller,
     String label,
-    IconData icon, {
+    IconData icon,
+    ThemeData theme,
+    bool isDark, {
     TextInputType keyboard = TextInputType.text,
   }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboard,
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return '$label is required';
-        }
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF003366)),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF003366), width: 2),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: theme.textTheme.labelSmall?.copyWith(
+              letterSpacing: 1.0,
+              color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextFormField(
+            controller: controller,
+            keyboardType: keyboard,
+            style: theme.textTheme.bodyMedium,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return '$label is required';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              hintText: label,
+              prefixIcon: Icon(icon, size: 18),
+            ),
+          ),
+        ],
       ),
     );
   }
