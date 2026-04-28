@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../theme/app_theme.dart';
+import '../widgets/micro_interactions.dart';
 import 'main_layout.dart';
 
 class ParentProfileSetupScreen extends StatefulWidget {
@@ -78,7 +79,7 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
 
       provider.completeParentProfile(parents: parents);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainLayout()),
+        FadePageRoute(page: const MainLayout()),
       );
     }
   }
@@ -213,12 +214,15 @@ class _ParentProfileSetupScreenState extends State<ParentProfileSetupScreen> {
                 SizedBox(
                   width: double.infinity,
                   height: 48,
-                  child: ElevatedButton(
-                    onPressed: _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  child: PressableScale(
+                    scaleFactor: 0.95,
+                    child: ElevatedButton(
+                      onPressed: _submitForm,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                      ),
+                      child: const Text('Complete Setup', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
-                    child: const Text('Complete Setup', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),

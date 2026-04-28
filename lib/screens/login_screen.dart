@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
+import '../widgets/micro_interactions.dart';
 import 'role_selection_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
+        FadePageRoute(page: const RoleSelectionScreen()),
       );
     }
   }
@@ -59,30 +60,33 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 60),
               _isLoading
                   ? const CircularProgressIndicator()
-                  : ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
-                        foregroundColor: isDark ? AppColors.darkText : AppColors.textPrimary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xl,
-                          vertical: AppSpacing.lg,
+                  : PressableScale(
+                      scaleFactor: 0.95,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+                          foregroundColor: isDark ? AppColors.darkText : AppColors.textPrimary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xl,
+                            vertical: AppSpacing.lg,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                            side: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                          ),
+                          elevation: 1,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.full),
-                          side: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                        onPressed: _handleGoogleSignIn,
+                        icon: const Icon(
+                          FontAwesomeIcons.google,
+                          color: AppColors.error,
                         ),
-                        elevation: 1,
-                      ),
-                      onPressed: _handleGoogleSignIn,
-                      icon: const Icon(
-                        FontAwesomeIcons.google,
-                        color: AppColors.error,
-                      ),
-                      label: const Text(
-                        'Sign in with Google',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                        label: const Text(
+                          'Sign in with Google',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

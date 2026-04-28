@@ -46,8 +46,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.surface,
       body: FadeTransition(
         opacity: _opacity,
         child: Center(

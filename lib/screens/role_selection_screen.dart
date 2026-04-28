@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../theme/app_theme.dart';
+import '../widgets/micro_interactions.dart';
 import 'child_profile_setup_screen.dart';
 import 'parent_profile_setup_screen.dart';
 
@@ -46,7 +47,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       onTap: () {
                         Provider.of<AppStateProvider>(context, listen: false).setRole('child');
                         Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (_) => const ChildProfileSetupScreen()),
+                          FadePageRoute(page: const ChildProfileSetupScreen()),
                         );
                       },
                     ),
@@ -59,7 +60,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       onTap: () {
                         Provider.of<AppStateProvider>(context, listen: false).setRole('parent');
                         Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (_) => const ParentProfileSetupScreen()),
+                          FadePageRoute(page: const ParentProfileSetupScreen()),
                         );
                       },
                     ),
@@ -84,8 +85,9 @@ class RoleSelectionScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final primary = AppColors.primary;
 
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
+      scaleFactor: 0.98,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacing.xl),

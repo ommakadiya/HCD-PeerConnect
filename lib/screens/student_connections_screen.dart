@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/dummy_users.dart';
+import '../widgets/micro_interactions.dart';
 import 'profile_details_screen.dart';
 
 class StudentConnectionsScreen extends StatefulWidget {
@@ -70,7 +71,7 @@ class _StudentConnectionsScreenState extends State<StudentConnectionsScreen> {
                 hintText: 'Search by name, skills, or location…',
                 prefixIcon: Icon(Icons.search, size: 20, color: isDark ? AppColors.darkTextMuted : AppColors.textMuted),
                 filled: true,
-                fillColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFF1F5F9),
+                fillColor: isDark ? AppColors.darkInputFill : const Color(0xFFF1F5F9),
                 contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.lg),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.full),
@@ -78,7 +79,9 @@ class _StudentConnectionsScreenState extends State<StudentConnectionsScreen> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.full),
-                  borderSide: BorderSide.none,
+                  borderSide: isDark
+                      ? BorderSide(color: AppColors.darkBorder.withValues(alpha: 0.5))
+                      : BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.full),
@@ -300,34 +303,9 @@ class _StudentConnectionsScreenState extends State<StudentConnectionsScreen> {
   //  CONNECT BUTTON with states
   // ══════════════════════════════════════════════
   Widget _buildConnectButton(DummyUser user, bool isDark) {
-    final connected = user.isConnected;
-    return SizedBox(
-      height: 34,
-      child: AnimatedContainer(
-        duration: AppDurations.normal,
-        child: ElevatedButton(
-          onPressed: () => _toggleConnection(user),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: connected ? AppColors.success : AppColors.primary,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                connected ? Icons.check : Icons.person_add_outlined,
-                size: 14,
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Text(connected ? 'Connected' : '+ Connect'),
-            ],
-          ),
-        ),
-      ),
+    return AnimatedConnectButton(
+      isConnected: user.isConnected,
+      onPressed: () => _toggleConnection(user),
     );
   }
 
@@ -337,8 +315,8 @@ class _StudentConnectionsScreenState extends State<StudentConnectionsScreen> {
   void _navigateToProfile(DummyUser user) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProfileDetailsScreen(
+      SlideFadePageRoute(
+        page: ProfileDetailsScreen(
           user: user,
           onConnectionStatusChanged: (status) {
             setState(() => user.isConnected = status);
@@ -408,7 +386,6 @@ class _StudentConnectionsScreenState extends State<StudentConnectionsScreen> {
   }
 
   Widget _buildSkeletonCard(bool isDark) {
-    final shimmer = isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0);
     final base = isDark ? AppColors.darkSurface : AppColors.surface;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -422,28 +399,28 @@ class _StudentConnectionsScreenState extends State<StudentConnectionsScreen> {
         children: [
           Row(
             children: [
-              Container(width: 40, height: 40, decoration: BoxDecoration(color: shimmer, shape: BoxShape.circle)),
+              const ShimmerBox(width: 40, height: 40, isCircle: true),
               const SizedBox(width: AppSpacing.md),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(width: 100, height: 14, decoration: BoxDecoration(color: shimmer, borderRadius: BorderRadius.circular(4))),
-                  const SizedBox(height: 6),
-                  Container(width: 70, height: 10, decoration: BoxDecoration(color: shimmer, borderRadius: BorderRadius.circular(4))),
+                children: const [
+                  ShimmerBox(width: 100, height: 14),
+                  SizedBox(height: 6),
+                  ShimmerBox(width: 70, height: 10),
                 ],
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           Row(
-            children: [
-              Container(width: 50, height: 20, decoration: BoxDecoration(color: shimmer, borderRadius: BorderRadius.circular(4))),
-              const SizedBox(width: 6),
-              Container(width: 60, height: 20, decoration: BoxDecoration(color: shimmer, borderRadius: BorderRadius.circular(4))),
+            children: const [
+              ShimmerBox(width: 50, height: 20),
+              SizedBox(width: 6),
+              ShimmerBox(width: 60, height: 20),
             ],
           ),
           const Spacer(),
-          Container(width: double.infinity, height: 34, decoration: BoxDecoration(color: shimmer, borderRadius: BorderRadius.circular(AppRadius.sm))),
+          const ShimmerBox(height: 34, borderRadius: AppRadius.sm),
         ],
       ),
     );

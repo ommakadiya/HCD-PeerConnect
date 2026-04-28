@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/dummy_users.dart';
 import '../theme/app_theme.dart';
+import '../widgets/micro_interactions.dart';
 
 class ProfileDetailsScreen extends StatefulWidget {
   final DummyUser user;
@@ -105,22 +106,33 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                     SizedBox(
                       width: 180,
                       height: 42,
-                      child: ElevatedButton.icon(
-                        onPressed: _toggleConnection,
-                        icon: Icon(
-                          isConnected ? Icons.check_rounded : Icons.person_add_outlined,
-                          size: 18,
-                        ),
-                        label: Text(
-                          isConnected ? 'Connected' : '+ Connect',
-                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isConnected ? AppColors.success : AppColors.primary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                      child: PressableScale(
+                        scaleFactor: 0.94,
+                        child: ElevatedButton.icon(
+                          onPressed: _toggleConnection,
+                          icon: AnimatedSwitcher(
+                            duration: AppDurations.fast,
+                            child: Icon(
+                              isConnected ? Icons.check_rounded : Icons.person_add_outlined,
+                              key: ValueKey(isConnected),
+                              size: 18,
+                            ),
+                          ),
+                          label: AnimatedSwitcher(
+                            duration: AppDurations.fast,
+                            child: Text(
+                              isConnected ? 'Connected' : '+ Connect',
+                              key: ValueKey(isConnected),
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isConnected ? AppColors.success : AppColors.primary,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                            ),
                           ),
                         ),
                       ),

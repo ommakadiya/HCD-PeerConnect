@@ -29,13 +29,14 @@ class AppColors {
   static const Color error         = Color(0xFFEF4444);
 
   // ─ Dark mode surfaces ─
-  static const Color darkBackground = Color(0xFF0B1220);
+  static const Color darkBackground = Color(0xFF0F1729);
   static const Color darkSurface    = Color(0xFF111827);
   static const Color darkBorder     = Color(0xFF1F2937);
+  static const Color darkInputFill  = Color(0xFF1F2937); // bg-gray-800 — elevated above surface
 
   // ─ Dark mode text ─
-  static const Color darkText       = Color(0xFFE5E7EB);
-  static const Color darkTextSecondary = Color(0xFF9CA3AF);
+  static const Color darkText       = Color(0xFFE5E7EB); // text-gray-200
+  static const Color darkTextSecondary = Color(0xFF9CA3AF); // text-gray-400
   static const Color darkTextMuted  = Color(0xFF6B7280);
 }
 
@@ -323,7 +324,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         isDense: true,
-        fillColor: AppColors.darkSurface,
+        fillColor: AppColors.darkInputFill,
         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.sm),
